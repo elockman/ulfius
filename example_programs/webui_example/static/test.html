@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head><title>Info</title></head>
+<body onload="readConfig()"> 
+
+<nav class="menu">
+<!--    <a href="info">INFO</a> | <a href="neighbors">NEIGHBORS</a> | <a href="sensors">SENSORS</a> | <a href="logging">LOGGING</a> | <a href="control">CONTROL</a> | <a href="config">CONFIG</a> | <a href="admin">ADMIN</a> | <a href="login">LOGIN</a> | <a href="logout">LOGOUT</a>-->
+    <a href="info">INFO</a> | <a href="control">CONTROL</a> | <a href="config">CONFIG</a> | <a href="admin">ADMIN</a> | <a href="test">TEST</a>
+</nav>
+<p id="ti"> </p>
+
+<h1>Information</h1>
+<p> </p>
+
+<h3>WiFi</h3>
+<p> Hostname: <var id="hn"></var></p>
+<p> Mode: <var id="wm"></var></p>
+<p> WAP SSID: <var id="ws"></var></p>
+<p> WAP Password: <var id="wp"></var></p>
+<p> SSID1: <var id="sid1"></var></p>
+<p> Password1: <var id="pw1"></var></p>
+<p> SSID2: <var id="sid2"></var></p>
+<p> Password2: <var id="pw2"></var></p>
+
+<h3>Mesh</h3>
+<p> Mesh SSID: <var id="ms"></var></p>
+<p> Mesh Password: <var id="mp"></var></p>
+<p> Mesh Channel: <var id="mch"></var></p>
+
+<h3>MQTT</h3>
+<p> Mode: <var id="mm"></var></p>
+<p> Remote Broker: <var id="rb"></var></p>
+<p> Local Broker: <var id="lb"></var></p>
+<p> Port: <var id="prt"></var></p>
+<p> Username: <var id="un"></var></p>
+<p> Password: <var id="pw"></var></p>
+
+<h3>Location</h3>
+<p> Site: <var id="st"></var></p>
+<p> Building: <var id="bld"></var></p>
+<p> Floor: <var id="flr"></var></p>
+<p> Room: <var id="rm"></var></p>
+<p> Location: <var id="loc"></var></p>
+<p> Function: <var id="fc"></var></p>
+<p> Name: <var id="nm"></var></p>
+
+<!--<h3>Versions</h3>
+<p> Kernel: <var id="kern"></var></p>
+<p> Build: <var id="bild"></var></p>
+<p> Logic: <var id="app"></var></p>
+<p> WebUI: <var id="web"></var></p>
+<p> Hardware: <var id="hw"></var></p>
+
+<h3>Hardware</h3>
+<p> Part: <var id="part"></var></p>
+<p> UUID: <var id="uuid"></var></p>
+<p> MAC: <var id="mac"></var></p>
+<p> Install: <var id="inst"></var></p>-->
+
+
+
+<script>
+
+async function readConfig() {
+  var response, data;
+
+  response = await fetch('cfg?group=wifi&param=name');
+  data = response.json();
+//   console.log(data);
+  document.getElementById('hn').innerHTML = data.name;
+//   document.getElementById('ti').innerHTML = data.name;
+
+  response = await fetch('cfg?group=wifi&param=mode');
+  data = response.json();
+  document.getElementById('wm').innerHTML = data.mode;
+
+  response = await fetch('cfg?group=wifi&param=wap_ssid');
+  data = response.json();
+  document.getElementById('ws').innerHTML = data.wap_ssid;
+
+  response = await fetch('cfg?group=wifi&param=wap_psk');
+  data = response.json();
+  document.getElementById('wp').innerHTML = data.wap_psk;
+
+  response = await fetch('cfg?group=wifi&param=ssid1');
+  data = response.json();
+  document.getElementById('sid1').innerHTML = data.ssid1;
+
+  response = await fetch('cfg?group=wifi&param=ssid2');
+  data = response.json();
+  document.getElementById('sid2').innerHTML = data.ssid2;
+
+//       document.getElementById('hn').innerHTML = cfgFile.configuration.wifi.name;
+//       document.getElementById('wm').innerHTML = cfgFile.configuration.wifi.mode;
+//       document.getElementById('ws').innerHTML = cfgFile.configuration.wifi.wap_ssid;
+//       document.getElementById('wp').innerHTML = cfgFile.configuration.wifi.wap_psk;
+//       document.getElementById('sid1').innerHTML = cfgFile.configuration.wifi.ssid1;
+//       document.getElementById('sid2').innerHTML = cfgFile.configuration.wifi.ssid2;
+// 
+//       document.getElementById('ms').innerHTML = cfgFile.configuration.mesh.mesh_ssid;
+//       document.getElementById('mp').innerHTML = cfgFile.configuration.mesh.mesh_psk;
+//       document.getElementById('mch').innerHTML = cfgFile.configuration.mesh.mesh_chan;
+// 
+//       document.getElementById('mm').innerHTML = cfgFile.configuration.mqtt.mode;
+//       document.getElementById('rb').innerHTML = cfgFile.configuration.mqtt.broker_remote_ip;
+//       document.getElementById('lb').innerHTML = cfgFile.configuration.mqtt.broker_local_ip;
+//       document.getElementById('prt').innerHTML = cfgFile.configuration.mqtt.broker_local_port;
+//       document.getElementById('un').innerHTML = cfgFile.configuration.mqtt.broker_local_username;
+//       document.getElementById('pw').innerHTML = cfgFile.configuration.mqtt.broker_local_psk;
+// 
+//       document.getElementById('st').innerHTML = cfgFile.configuration.location.site;
+//       document.getElementById('bld').innerHTML = cfgFile.configuration.location.building;
+//       document.getElementById('flr').innerHTML = cfgFile.configuration.location.floor;
+//       document.getElementById('rm').innerHTML = cfgFile.configuration.location.room;
+//       document.getElementById('loc').innerHTML = cfgFile.configuration.location.location;
+//       document.getElementById('fc').innerHTML = cfgFile.configuration.location.function;
+//       document.getElementById('nm').innerHTML = cfgFile.configuration.location.name;
+
+  document.getElementById('pw1').innerHTML = '********';
+  document.getElementById('pw2').innerHTML = '********';
+}
+</script>
+</body>
+
+
+
+<!--<body>
+
+<form action="#" method="post">
+    <h3>WiFi</h3>
+    <p>Hostname:   <input type="text" id="hn" name="hostname" /></p>
+    <input type="radio" name="wifi_mode" id="wap" value="Accesspoint"> Accesspoint </input><br>
+    <input type="radio" name="wifi_mode" id="cli" value="Client" checked="checked"> Client </input><br>
+    <input type="radio" name="wifi_mode" id="off" value="Disabled"> Disable </input><br>
+    <p>WAP SSID:   <input type="text" name="wap_ssid" /></p>
+    <p>WAP Password: <input type="text" name="wap_psk" /></p>
+    <p>SSID1:      <input type="text" name="ssid1" /></p>
+    <p>Password1:  <input type="text" name="psk1" /></p>
+    <p>SSID2:      <input type="text" name="ssid2" /></p>
+    <p>Password2:  <input type="text" name="psk2" /></p>
+    <p> </p>
+
+    <h3>Mesh</h3>
+    <p>Mesh SSID:     <input type="text" name="mesh_ssid" /></p>
+    <p>Mesh Password: <input type="text" name="mesh_psk" /></p>
+    <p>Mesh Channel:  <input type="text" name="mesh_chan" /></p>
+    <p> </p>
+
+    <h3>MQTT</h3>
+    <input type="radio" name="mqtt_mode" id="br1" value="Primary Host"> Primary Host </input><br>
+    <input type="radio" name="mqtt_mode" id="br2" value="Secondary Host"> Secondary Host </input><br>
+    <input type="radio" name="mqtt_mode" id="off" value="Client" checked="checked"> Client </input><br>
+    <p>Broker Remote:  <input type="text" name="broker_remote" /></p>
+    <p>Broker Local:   <input type="text" name="broker_local" /></p>
+    <p>Port:           <input type="text" name="broker_port" /></p>
+    <p>Username:       <input type="text" name="broker_user" /></p>
+    <p>Password:       <input type="text" name="broker_psk" /></p>
+    <p> </p>
+
+    <h3>Location</h3>
+    <p>Site:       <input type="text" name="site" /></p>
+    <p>Building:   <input type="text" name="building" /></p>
+    <p>Floor:      <input type="text" name="floor" /></p>
+    <p>Room:       <input type="text" name="room" /></p>
+    <p>Location:   <input type="text" name="location" /></p>
+    <p>Function:   <input type="text" name="function" /></p>
+    <p>Name:       <input type="text" name="name" /></p>
+    <p> </p>
+
+    <button type="button" id=conf onclick="update_config()">SUBMIT</button>
+
+</form>
+
+<script>
+async function update_config() { 
+  document.getElementById('test_display').innerHTML = document.getElementById('hn').value;
+  document.getElementById('hn').value = "";
+  location.href = "/info";
+}
+</script>
+
+</body>-->
+</html>

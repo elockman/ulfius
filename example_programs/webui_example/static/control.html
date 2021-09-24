@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Control</title>
+<script>
+async function redLedOn() { 
+  document.getElementById('rLED').innerHTML = 'OFF';
+  document.getElementById('rLED').onclick= function() {redLedOff()};
+  fetch('led?clr=red&val=1')
+    .then(response => response.json())
+    .then(data => console.log(data));
+}
+async function redLedOff() { 
+  document.getElementById('rLED').innerHTML = 'ON';
+  document.getElementById('rLED').onclick= function() {redLedOn()};
+  fetch('led?clr=red&val=0')
+    .then(response => response.json())
+    .then(data => console.log(data));
+}
+
+async function grnLedOn() { 
+  document.getElementById('gLED').innerHTML = 'OFF';
+  document.getElementById('gLED').onclick= function() {grnLedOff()};
+  fetch('led?clr=green&val=1')
+    .then(response => response.json())
+    .then(data => console.log(data));
+}
+async function grnLedOff() { 
+  document.getElementById('gLED').innerHTML = 'ON';
+  document.getElementById('gLED').onclick= function() {grnLedOn()};
+  fetch('led?clr=green&val=0')
+    .then(response => response.json())
+    .then(data => console.log(data));
+}
+
+async function bluLedOn() { 
+  document.getElementById('bLED').innerHTML = 'OFF';
+  document.getElementById('bLED').onclick= function() {bluLedOff()};
+  fetch('led?clr=blue&val=1')
+    .then(response => response.json())
+    .then(data => console.log(data));
+}
+async function bluLedOff() { 
+  document.getElementById('bLED').innerHTML = 'ON';
+  document.getElementById('bLED').onclick= function() {bluLedOn()};
+  fetch('led?clr=blue&val=0')
+    .then(response => response.json())
+    .then(data => console.log(data));
+}
+
+async function meshPwrOn() { 
+  document.getElementById('bmesh').innerHTML = 'OFF';
+  document.getElementById('bmesh').onclick= function() {meshPwrOff()};
+  fetch('mesh?val=1')
+    .then(response => response.json())
+    .then(data => console.log(data));
+}
+async function meshPwrOff() { 
+  document.getElementById('bmesh').innerHTML = 'ON';
+  document.getElementById('bmesh').onclick= function() {meshPwrOn()};
+  fetch('mesh?val=0')
+    .then(response => response.json())
+    .then(data => console.log(data));
+}
+
+async function wifiPwrOn() { 
+  document.getElementById('bwifi').innerHTML = 'OFF';
+  document.getElementById('bwifi').onclick= function() {wifiPwrOff()};
+  fetch('wifi?val=1')
+    .then(response => response.json())
+    .then(data => console.log(data));
+}
+async function wifiPwrOff() { 
+  document.getElementById('bwifi').innerHTML = 'ON';
+  document.getElementById('bwifi').onclick= function() {wifiPwrOn()};
+  fetch('wifi?val=0')
+    .then(response => response.json())
+    .then(data => console.log(data));
+}
+
+async function getInputValues() {
+  fetch('adc?chan=pb')
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+      document.getElementById('val_btn').innerHTML=data.state;
+    })
+  fetch('adc?chan=model')
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+      document.getElementById('val_hw_model').innerHTML=data.value;
+    })
+  fetch('adc?chan=hw')
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+      document.getElementById('val_hw_ver').innerHTML=data.value;
+    })
+  fetch('adc?chan=vin')
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+      document.getElementById('val_vin').innerHTML=data.value;
+    })
+}
+</script>
+</head>
+
+<body onload="getInputValues()" >
+
+<nav class="menu">
+    <a href="info">INFO</a> | <a href="neighbors">NEIGHBORS</a> | <a href="sensors">SENSORS</a> | <a href="logging">LOGGING</a> | <a href="control">CONTROL</a> | <a href="config">CONFIG</a> | <a href="admin">ADMIN</a> | <a href="login">LOGIN</a> | <a href="logout">LOGOUT</a>
+</nav>
+<p> </p>
+
+<h1>Control</h1>
+
+<u><h3>DIGITAL INPUTs</h3></u>
+<img id="in_btn" src="images/led-off.png" width="15" height="15"> Button: <p id="val_btn"></p>
+<p> </p>
+
+<u><h3>DIGITAL OUTPUTs</h3></u>
+<img id="led_l1x" src="images/led-off.png" width="15" height="15">
+<button type="button" id=rLED onclick="redLedOn()">ON</button> Red LED
+<p> </p>
+<img id="led_l2x" src="images/led-off.png" width="15" height="15">
+<button type="button" id=gLED onclick="grnLedOn()">ON</button> Green LED
+<p> </p>
+<img id="led_l3x" src="images/led-off.png" width="15" height="15">
+<button type="button" id=bLED onclick="bluLedOn()">ON</button> Blue LED
+<p> </p>
+<img id="led_mesh" src="images/led-off.png" width="15" height="15">
+<button type="button" id=bmesh onclick="meshPwrOn()">ON</button> Mesh Radio Power
+<p> </p>
+<img id="led_wifi" src="images/led-off.png" width="15" height="15">
+<button type="button" id=bwifi onclick="wifiPwrOn()">ON</button> WiFi Radio Power
+<p> </p>
+
+<u><h3>ADCs</h3></u>
+HW Model: <p id="val_hw_model"></p>
+<p> </p>
+HW Version: <p id="val_hw_ver"></p>
+<p> </p>
+Input Voltage: <p id="val_vin"></p>
+<p> </p>
+
+<u><h3>ONBOARD SENSORS</h3></u>
+Temperature (F): <p id="val_obs_temp"></p>
+<p> </p>
+Rel Humidity (%): <p id="val_obs_humid"></p>
+<p> </p>
+CO2 (%): <p id="val_obs_co2"></p>
+<p> </p>
+PM1.0 (ug/m3): <p id="val_obs_pm1"></p>
+<p> </p>
+PM2.5 (ug/m3): <p id="val_obs_pm2_5"></p>
+<p> </p>
+PM10 (ug/m3): <p id="val_obs_pm10"></p>
+<p> </p>
+
+<u><h3>ADVANCED</h3></u>
+<button type="button" id=btn_reboot onclick="Reboot()">Reboot</button>
+<p> </p>
+
+
+</body>
+</html>
+
+
+
+<!--
+
+async function getInputValues() {
+  fetch('pb')
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+      document.getElementById('val_btn').innerHTML=data.state;
+    })
+
+  fetch('hw_model')
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+      document.getElementById('val_hw_model').innerHTML=data.value;
+    })
+  fetch('hw_version')
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+      document.getElementById('val_hw_ver').innerHTML=data.value;
+    })
+  fetch('input_voltage')
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+      document.getElementById('val_vin').innerHTML=data.value;
+    })
+
+
+  fetch('temperature/f')
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+      document.getElementById('val_obs_temp').innerHTML=data.value;
+    })
+  fetch('humid')
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+      document.getElementById('val_obs_humid').innerHTML=data.value;
+    })
+  fetch('co2')
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+      document.getElementById('val_obs_co2').innerHTML=data.value;
+    })
+  fetch('pm1')
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+      document.getElementById('val_obs_pm1').innerHTML=data.value;
+    })
+  fetch('pm2_5')
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+      document.getElementById('val_obs_pm2_5').innerHTML=data.value;
+    })
+  fetch('pm10')
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+      document.getElementById('val_obs_pm10').innerHTML=data.value;
+    })
+}
+
+var interval = setInterval(getInputValues, 5000);
+
+</script>
+<noscript>Sorry, your browser does not support JavaScript!</noscript> 
+
+-->

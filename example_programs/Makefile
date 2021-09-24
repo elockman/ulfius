@@ -16,6 +16,7 @@
 ULFIUS_LOCATION=../src
 SIMPLE_EXAMPLE_LOCATION=./simple_example
 SHEEP_COUNTER_LOCATION=./sheep_counter
+WEBUI_LOCATION=./webui_example
 PROXY_EXAMPLE_LOCATION=./proxy_example
 REQUEST_EXAMPLE_LOCATION=./request_example
 TEST_U_MAP_LOCATION=./test_u_map
@@ -31,6 +32,7 @@ debug:
 	cd $(ULFIUS_LOCATION) && $(MAKE) debug
 	cd $(SIMPLE_EXAMPLE_LOCATION) && $(MAKE) debug
 	cd $(SHEEP_COUNTER_LOCATION) && $(MAKE) debug
+	cd $(WEBUI_LOCATION) && $(MAKE) debug
 	cd $(PROXY_EXAMPLE_LOCATION) && $(MAKE) debug
 	cd $(REQUEST_EXAMPLE_LOCATION) && $(MAKE) debug
 	cd $(INJECTION_EXAMPLE_LOCATION) && $(MAKE) debug
@@ -43,6 +45,7 @@ debug:
 clean:
 	cd $(SIMPLE_EXAMPLE_LOCATION) && $(MAKE) clean
 	cd $(SHEEP_COUNTER_LOCATION) && $(MAKE) clean
+	cd $(WEBUI_LOCATION) && $(MAKE) clean
 	cd $(PROXY_EXAMPLE_LOCATION) && $(MAKE) clean
 	cd $(REQUEST_EXAMPLE_LOCATION) && $(MAKE) clean
 	cd $(INJECTION_EXAMPLE_LOCATION) && $(MAKE) clean

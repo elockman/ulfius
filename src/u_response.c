@@ -635,6 +635,12 @@ int ulfius_set_response_properties(struct _u_response * response, ...) {
           ret = ulfius_set_json_body_response(response, response->status, j_value);
           break;
 #endif
+#ifndef U_DISABLE_CJSON
+        case U_OPT_CJSON_BODY:
+          str_value = va_arg(vl, const char *);
+          ret = ulfius_set_cjson_body_response(response, response->status, str_value);
+          break;
+#endif
         case U_OPT_SHARED_DATA:
           response->shared_data = va_arg(vl, void *);
           break;
@@ -705,6 +711,25 @@ json_t * ulfius_get_json_body_response(struct _u_response * response, json_error
     return json_loadb(response->binary_body, response->binary_body_length, JSON_DECODE_ANY, json_error);
   }
   return NULL;
+}
+#endif
+
+#ifndef U_DISABLE_CJSON
+/**
+ * ulfius_set_cjson_body_response
+ * Add a cjson body to a response
+ * return U_OK on success
+ */
+int ulfius_set_cjson_body_response(struct _u_response * response, const unsigned int status, const char * j_body) {
+  if (response != NULL && j_body != NULL) {
+    response->binary_body = j_body;
+    response->binary_body_length = o_strlen((char*)response->binary_body);
+    response->status = status;
+    u_map_put(response->map_header, ULFIUS_HTTP_HEADER_CONTENT, ULFIUS_HTTP_ENCODING_JSON);
+    return U_OK;
+  } else {
+    return U_ERROR_PARAMS;
+  }
 }
 #endif
 

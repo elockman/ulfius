@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head><title>Info</title></head>
+<body onload="readConfig()"> 
+
+<nav class="menu">
+<!--    <a href="info">INFO</a> | <a href="neighbors">NEIGHBORS</a> | <a href="sensors">SENSORS</a> | <a href="logging">LOGGING</a> | <a href="control">CONTROL</a> | <a href="config">CONFIG</a> | <a href="admin">ADMIN</a> | <a href="login">LOGIN</a> | <a href="logout">LOGOUT</a>-->
+    <a href="info">INFO</a> | <a href="control">CONTROL</a> | <a href="config">CONFIG</a> | <a href="admin">ADMIN</a> | <a href="test">TEST</a>
+</nav>
+<p id="ti"> </p>
+
+<h1>Information</h1>
+<p> </p>
+
+<h3>WiFi</h3>
+<p> Hostname: <var id="hn"></var></p>
+<p> Mode: <var id="wm"></var></p>
+<p> WAP SSID: <var id="ws"></var></p>
+<p> WAP Password: <var id="wp"></var></p>
+<p> SSID1: <var id="sid1"></var></p>
+<p> Password1: <var id="pw1"></var></p>
+<p> SSID2: <var id="sid2"></var></p>
+<p> Password2: <var id="pw2"></var></p>
+
+<h3>Mesh</h3>
+<p> Mesh SSID: <var id="ms"></var></p>
+<p> Mesh Password: <var id="mp"></var></p>
+<p> Mesh Channel: <var id="mc"></var></p>
+
+<h3>MQTT</h3>
+<p> Mode: <var id="mm"></var></p>
+<p> Remote Broker: <var id="rb"></var></p>
+<p> Local Broker: <var id="lb"></var></p>
+<p> Port: <var id="prt"></var></p>
+<p> Username: <var id="un"></var></p>
+<p> Password: <var id="pw"></var></p>
+
+<h3>Location</h3>
+<p> Site: <var id="st"></var></p>
+<p> Building: <var id="bld"></var></p>
+<p> Floor: <var id="flr"></var></p>
+<p> Room: <var id="rm"></var></p>
+<p> Location: <var id="loc"></var></p>
+<p> Function: <var id="fc"></var></p>
+<p> Name: <var id="nm"></var></p>
+
+<!--<h3>Versions</h3>
+<p> Kernel: <var id="kern"></var></p>
+<p> Build: <var id="bild"></var></p>
+<p> Logic: <var id="app"></var></p>
+<p> WebUI: <var id="web"></var></p>
+<p> Hardware: <var id="hw"></var></p>
+
+<h3>Hardware</h3>
+<p> Part: <var id="part"></var></p>
+<p> UUID: <var id="uuid"></var></p>
+<p> MAC: <var id="mac"></var></p>
+<p> Install: <var id="inst"></var></p>-->
+
+
+
+<script>
+
+async function readConfig() {
+
+  await fetch('/cfg?group=wifi&param=name')
+  .then(response => { return response.json(); })
+  .then(data => { document.getElementById('hn').innerHTML = JSON.stringify(data.name); })
+
+  await fetch('/cfg?group=wifi&param=mode')
+  .then(response => { return response.json(); })
+  .then(data => { document.getElementById('wm').innerHTML = JSON.stringify(data.mode); })
+
+  await fetch('/cfg?group=wifi&param=wap_ssid')
+  .then(response => { return response.json(); })
+  .then(data => { document.getElementById('ws').innerHTML = JSON.stringify(data.wap_ssid); })
+
+  await fetch('/cfg?group=wifi&param=wap_psk')
+  .then(response => { return response.json(); })
+  .then(data => { document.getElementById('wp').innerHTML = JSON.stringify(data.wap_psk); })
+
+  await fetch('/cfg?group=wifi&param=ssid1')
+  .then(response => { return response.json(); })
+  .then(data => { document.getElementById('sid1').innerHTML = JSON.stringify(data.ssid1); })
+
+  await fetch('/cfg?group=wifi&param=ssid2')
+  .then(response => { return response.json(); })
+  .then(data => { document.getElementById('sid2').innerHTML = JSON.stringify(data.ssid2); })
+
+
+  await fetch('/cfg?group=mesh&param=mesh_ssid')
+  .then(response => { return response.json(); })
+  .then(data => { document.getElementById('ms').innerHTML = JSON.stringify(data.mesh_ssid); })
+
+  await fetch('/cfg?group=mesh&param=mesh_psk')
+  .then(response => { return response.json(); })
+  .then(data => { document.getElementById('mp').innerHTML = JSON.stringify(data.mesh_psk); })
+
+  await fetch('/cfg?group=mesh&param=mesh_chan')
+  .then(response => { return response.json(); })
+  .then(data => { document.getElementById('mc').innerHTML = JSON.stringify(data.mesh_chan); })
+
+
+  await fetch('/cfg?group=mqtt&param=mode')
+  .then(response => { return response.json(); })
+  .then(data => { document.getElementById('mm').innerHTML = JSON.stringify(data.mode); })
+
+  await fetch('/cfg?group=mqtt&param=broker_remote_ip')
+  .then(response => { return response.json(); })
+  .then(data => { document.getElementById('rb').innerHTML = JSON.stringify(data.broker_remote_ip); })
+
+  await fetch('/cfg?group=mqtt&param=broker_local_ip')
+  .then(response => { return response.json(); })
+  .then(data => { document.getElementById('lb').innerHTML = JSON.stringify(data.broker_local_ip); })
+
+  await fetch('/cfg?group=mqtt&param=broker_local_port')
+  .then(response => { return response.json(); })
+  .then(data => { document.getElementById('prt').innerHTML = JSON.stringify(data.broker_local_port); })
+
+  await fetch('/cfg?group=mqtt&param=broker_local_username')
+  .then(response => { return response.json(); })
+  .then(data => { document.getElementById('un').innerHTML = JSON.stringify(data.broker_local_username); })
+
+  await fetch('/cfg?group=mqtt&param=broker_local_psk')
+  .then(response => { return response.json(); })
+  .then(data => { document.getElementById('pw').innerHTML = JSON.stringify(data.broker_local_psk); })
+
+
+  await fetch('/cfg?group=location&param=site')
+  .then(response => { return response.json(); })
+  .then(data => { document.getElementById('st').innerHTML = JSON.stringify(data.site); })
+
+  await fetch('/cfg?group=location&param=building')
+  .then(response => { return response.json(); })
+  .then(data => { document.getElementById('bld').innerHTML = JSON.stringify(data.building); })
+
+  await fetch('/cfg?group=location&param=floor')
+  .then(response => { return response.json(); })
+  .then(data => { document.getElementById('flr').innerHTML = JSON.stringify(data.floor); })
+
+  await fetch('/cfg?group=location&param=room')
+  .then(response => { return response.json(); })
+  .then(data => { document.getElementById('rm').innerHTML = JSON.stringify(data.room); })
+
+  await fetch('/cfg?group=location&param=location')
+  .then(response => { return response.json(); })
+  .then(data => { document.getElementById('loc').innerHTML = JSON.stringify(data.location); })
+
+  await fetch('/cfg?group=location&param=function')
+  .then(response => { return response.json(); })
+  .then(data => { document.getElementById('fc').innerHTML = JSON.stringify(data.function); })
+
+  await fetch('/cfg?group=location&param=name')
+  .then(response => { return response.json(); })
+  .then(data => { document.getElementById('nm').innerHTML = JSON.stringify(data.name); })
+
+
+  document.getElementById('pw1').innerHTML = '********';
+  document.getElementById('pw2').innerHTML = '********';
+}
+</script>
+</body>
+
+
+
+<!--<body>
+
+<form action="#" method="post">
+    <h3>WiFi</h3>
+    <p>Hostname:   <input type="text" id="hn" name="hostname" /></p>
+    <input type="radio" name="wifi_mode" id="wap" value="Accesspoint"> Accesspoint </input><br>
+    <input type="radio" name="wifi_mode" id="cli" value="Client" checked="checked"> Client </input><br>
+    <input type="radio" name="wifi_mode" id="off" value="Disabled"> Disable </input><br>
+    <p>WAP SSID:   <input type="text" name="wap_ssid" /></p>
+    <p>WAP Password: <input type="text" name="wap_psk" /></p>
+    <p>SSID1:      <input type="text" name="ssid1" /></p>
+    <p>Password1:  <input type="text" name="psk1" /></p>
+    <p>SSID2:      <input type="text" name="ssid2" /></p>
+    <p>Password2:  <input type="text" name="psk2" /></p>
+    <p> </p>
+
+    <h3>Mesh</h3>
+    <p>Mesh SSID:     <input type="text" name="mesh_ssid" /></p>
+    <p>Mesh Password: <input type="text" name="mesh_psk" /></p>
+    <p>Mesh Channel:  <input type="text" name="mesh_chan" /></p>
+    <p> </p>
+
+    <h3>MQTT</h3>
+    <input type="radio" name="mqtt_mode" id="br1" value="Primary Host"> Primary Host </input><br>
+    <input type="radio" name="mqtt_mode" id="br2" value="Secondary Host"> Secondary Host </input><br>
+    <input type="radio" name="mqtt_mode" id="off" value="Client" checked="checked"> Client </input><br>
+    <p>Broker Remote:  <input type="text" name="broker_remote" /></p>
+    <p>Broker Local:   <input type="text" name="broker_local" /></p>
+    <p>Port:           <input type="text" name="broker_port" /></p>
+    <p>Username:       <input type="text" name="broker_user" /></p>
+    <p>Password:       <input type="text" name="broker_psk" /></p>
+    <p> </p>
+
+    <h3>Location</h3>
+    <p>Site:       <input type="text" name="site" /></p>
+    <p>Building:   <input type="text" name="building" /></p>
+    <p>Floor:      <input type="text" name="floor" /></p>
+    <p>Room:       <input type="text" name="room" /></p>
+    <p>Location:   <input type="text" name="location" /></p>
+    <p>Function:   <input type="text" name="function" /></p>
+    <p>Name:       <input type="text" name="name" /></p>
+    <p> </p>
+
+    <button type="button" id=conf onclick="update_config()">SUBMIT</button>
+
+</form>
+
+<script>
+async function update_config() { 
+  document.getElementById('test_display').innerHTML = document.getElementById('hn').value;
+  document.getElementById('hn').value = "";
+  location.href = "/info";
+}
+</script>
+
+</body>-->
+</html>

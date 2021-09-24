@@ -41,6 +41,7 @@
     ULFIUS_VERSION_PATCH >= (patch)))
 
 #cmakedefine U_DISABLE_JANSSON
+#cmakedefine U_DISABLE_CJSON
 #cmakedefine U_DISABLE_CURL
 #cmakedefine U_DISABLE_GNUTLS
 #cmakedefine U_DISABLE_WEBSOCKET

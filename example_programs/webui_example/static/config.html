@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head><title>Config</title></head>
+<body>
+
+<nav class="menu">
+    <a href="info">INFO</a> | <a href="neighbors">NEIGHBORS</a> | <a href="sensors">SENSORS</a> | <a href="logging">LOGGING</a> | <a href="control">CONTROL</a> | <a href="config">CONFIG</a> | <a href="admin">ADMIN</a> | <a href="login">LOGIN</a> | <a href="logout">LOGOUT</a>
+</nav>
+<p> </p>
+
+<h1>Configuration</h1>
+<!-- <p id="ti">test-script</p> -->
+
+<form action="#" method="post">
+    <h3>WiFi</h3>
+    <p>Hostname:   <input type="text" name="hostname" id="hn"/></p>
+    <input type="radio" name="wifi_mode" id="wap" value="Accesspoint"> Accesspoint </input><br>
+    <input type="radio" name="wifi_mode" id="cli" value="Client" checked="checked"> Client </input><br>
+    <input type="radio" name="wifi_mode" id="off" value="Disabled"> Disable </input><br>
+    <p>WAP SSID:   <input type="text" name="wap_ssid" id="ws"/></p>
+    <p>WAP Password: <input type="text" name="wap_psk" id="wp"/></p>
+    <p>SSID1:      <input type="text" name="ssid1" id="sid1"/></p>
+    <p>Password1:  <input type="text" name="psk1" id="pw1"/></p>
+    <p>SSID2:      <input type="text" name="ssid2" id="sid2"/></p>
+    <p>Password2:  <input type="text" name="psk2" id="pw2"/></p>
+    <p> </p>
+
+    <h3>Mesh</h3>
+    <p>Mesh SSID:     <input type="text" name="mesh_ssid" id="ms"/></p>
+    <p>Mesh Password: <input type="text" name="mesh_psk" id="mp"/></p>
+    <p>Mesh Channel:  <input type="text" name="mesh_chan" id="mc"/></p>
+    <p> </p>
+
+    <h3>MQTT</h3>
+    <input type="radio" name="mqtt_mode" id="br1" value="Primary Host"> Primary Host </input><br>
+    <input type="radio" name="mqtt_mode" id="br2" value="Secondary Host"> Secondary Host </input><br>
+    <input type="radio" name="mqtt_mode" id="br0" value="Client" checked="checked"> Client </input><br>
+    <p>Broker Remote:  <input type="text" name="broker_remote" id="rb"/></p>
+    <p>Broker Local:   <input type="text" name="broker_local" id="lb"/></p>
+    <p>Port:           <input type="text" name="broker_port" id="lp"/></p>
+    <p>Username:       <input type="text" name="broker_user" id="un"/></p>
+    <p>Password:       <input type="text" name="broker_psk" id="pw"/></p>
+    <p> </p>
+
+    <h3>Location</h3>
+    <p>Site:       <input type="text" name="site" id="st"/></p>
+    <p>Building:   <input type="text" name="building" id="bld"/></p>
+    <p>Floor:      <input type="text" name="floor" id="flr"/></p>
+    <p>Room:       <input type="text" name="room" id="rm"/></p>
+    <p>Location:   <input type="text" name="location" id="loc"/></p>
+    <p>Function:   <input type="text" name="function" id="fct"/></p>
+    <p>Name:       <input type="text" name="name" id="nm"/></p>
+    <p> </p>
+
+    <button type="button" id=bSubmit onclick="update_config()">SUBMIT</button>
+    
+</form>
+
+<script>
+async function update_config() { 
+
+//   document.getElementById('ti').innerHTML = "UPDATED!";
+
+  if (document.getElementById('hn').value.length!=0) {
+    let cfgCmd = "cfg_set?group=wifi&param=name&value=";
+    let cfgVal = document.getElementById('hn').value;
+    let cfgCommand = cfgCmd.concat(cfgVal);
+    fetch(cfgCommand);
+  }
+  if(document.getElementById('wap').checked) {
+    fetch("cfg_set?group=wifi&param=mode&value=Accesspoint");
+  }else if(document.getElementById('cli').checked) {
+    fetch("cfg_set?group=wifi&param=mode&value=Client");
+  }else if(document.getElementById('off').checked) {
+    fetch("cfg_set?group=wifi&param=mode&value=Disabled");
+  }
+  if (document.getElementById('ws').value.length!=0) {
+    let cfgCmd = "cfg_set?group=wifi&param=wap_ssid&value=";
+    let cfgVal = document.getElementById('ws').value;
+    let cfgCommand = cfgCmd.concat(cfgVal);
+    fetch(cfgCommand);
+  }
+  if (document.getElementById('wp').value.length!=0) {
+    let cfgCmd = "cfg_set?group=wifi&param=wap_psk&value=";
+    let cfgVal = document.getElementById('wp').value;
+    let cfgCommand = cfgCmd.concat(cfgVal);
+    fetch(cfgCommand);
+  }
+  if (document.getElementById('sid1').value.length!=0) {
+    let cfgCmd = "cfg_set?group=wifi&param=ssid1&value=";
+    let cfgVal = document.getElementById('sid1').value;
+    let cfgCommand = cfgCmd.concat(cfgVal);
+    fetch(cfgCommand);
+  }
+  if (document.getElementById('pw1').value.length!=0) {
+    let cfgCmd = "cfg_set?group=wifi&param=psk1&value=";
+    let cfgVal = document.getElementById('pw1').value;
+    let cfgCommand = cfgCmd.concat(cfgVal);
+    fetch(cfgCommand);
+  }
+  if (document.getElementById('sid2').value.length!=0) {
+    let cfgCmd = "cfg_set?group=wifi&param=ssid2&value=";
+    let cfgVal = document.getElementById('sid2').value;
+    let cfgCommand = cfgCmd.concat(cfgVal);
+    fetch(cfgCommand);
+  }
+  if (document.getElementById('pw2').value.length!=0) {
+    let cfgCmd = "cfg_set?group=wifi&param=psk2&value=";
+    let cfgVal = document.getElementById('pw2').value;
+    let cfgCommand = cfgCmd.concat(cfgVal);
+    fetch(cfgCommand);
+  }
+
+  if (document.getElementById('ms').value.length!=0) {
+    let cfgCmd = "cfg_set?group=mesh&param=mesh_ssid&value=";
+    let cfgVal = document.getElementById('ms').value;
+    let cfgCommand = cfgCmd.concat(cfgVal);
+    fetch(cfgCommand);
+  }
+  if (document.getElementById('mp').value.length!=0) {
+    let cfgCmd = "cfg_set?group=mesh&param=mesh_psk&value=";
+    let cfgVal = document.getElementById('mp').value;
+    let cfgCommand = cfgCmd.concat(cfgVal);
+    fetch(cfgCommand);
+  }
+  if (document.getElementById('mc').value.length!=0) {
+    let cfgCmd = "cfg_set?group=mesh&param=mesh_chan&value=";
+    let cfgVal = document.getElementById('mc').value;
+    let cfgCommand = cfgCmd.concat(cfgVal);
+    fetch(cfgCommand);
+  }
+
+  if(document.getElementById('br1').checked) {
+    fetch("cfg_set?group=mqtt&param=mode&value=Primary Host");
+  }else if(document.getElementById('br2').checked) {
+    fetch("cfg_set?group=mqtt&param=mode&value=Secondary Host");
+  }else if(document.getElementById('br0').checked) {
+    fetch("cfg_set?group=mqtt&param=mode&value=Client");
+  }
+  if (document.getElementById('rb').value.length!=0) {
+    let cfgCmd = "cfg_set?group=mqtt&param=broker_remote&value=";
+    let cfgVal = document.getElementById('rb').value;
+    let cfgCommand = cfgCmd.concat(cfgVal);
+    fetch(cfgCommand);
+  }
+  if (document.getElementById('lb').value.length!=0) {
+    let cfgCmd = "cfg_set?group=mqtt&param=broker_local&value=";
+    let cfgVal = document.getElementById('lb').value;
+    let cfgCommand = cfgCmd.concat(cfgVal);
+    fetch(cfgCommand);
+  }
+  if (document.getElementById('lp').value.length!=0) {
+    let cfgCmd = "cfg_set?group=mqtt&param=broker_port&value=";
+    let cfgVal = document.getElementById('lp').value;
+    let cfgCommand = cfgCmd.concat(cfgVal);
+    fetch(cfgCommand);
+  }
+  if (document.getElementById('un').value.length!=0) {
+    let cfgCmd = "cfg_set?group=mqtt&param=broker_user&value=";
+    let cfgVal = document.getElementById('un').value;
+    let cfgCommand = cfgCmd.concat(cfgVal);
+    fetch(cfgCommand);
+  }
+  if (document.getElementById('pw').value.length!=0) {
+    let cfgCmd = "cfg_set?group=mqtt&param=broker_psk&value=";
+    let cfgVal = document.getElementById('pw').value;
+    let cfgCommand = cfgCmd.concat(cfgVal);
+    fetch(cfgCommand);
+  }
+
+  if (document.getElementById('st').value.length!=0) {
+    let cfgCmd = "cfg_set?group=location&param=site&value=";
+    let cfgVal = document.getElementById('st').value;
+    let cfgCommand = cfgCmd.concat(cfgVal);
+    fetch(cfgCommand);
+  }
+  if (document.getElementById('bld').value.length!=0) {
+    let cfgCmd = "cfg_set?group=location&param=building&value=";
+    let cfgVal = document.getElementById('bld').value;
+    let cfgCommand = cfgCmd.concat(cfgVal);
+    fetch(cfgCommand);
+  }
+  if (document.getElementById('flr').value.length!=0) {
+    let cfgCmd = "cfg_set?group=location&param=floor&value=";
+    let cfgVal = document.getElementById('flr').value;
+    let cfgCommand = cfgCmd.concat(cfgVal);
+    fetch(cfgCommand);
+  }
+  if (document.getElementById('rm').value.length!=0) {
+    let cfgCmd = "cfg_set?group=location&param=room&value=";
+    let cfgVal = document.getElementById('rm').value;
+    let cfgCommand = cfgCmd.concat(cfgVal);
+    fetch(cfgCommand);
+  }
+  if (document.getElementById('loc').value.length!=0) {
+    let cfgCmd = "cfg_set?group=location&param=location&value=";
+    let cfgVal = document.getElementById('loc').value;
+    let cfgCommand = cfgCmd.concat(cfgVal);
+    fetch(cfgCommand);
+  }
+  if (document.getElementById('fct').value.length!=0) {
+    let cfgCmd = "cfg_set?group=location&param=function&value=";
+    let cfgVal = document.getElementById('fct').value;
+    let cfgCommand = cfgCmd.concat(cfgVal);
+    fetch(cfgCommand);
+  }
+  if (document.getElementById('nm').value.length!=0) {
+    let cfgCmd = "cfg_set?group=location&param=name&value=";
+    let cfgVal = document.getElementById('nm').value;
+    let cfgCommand = cfgCmd.concat(cfgVal);
+    fetch(cfgCommand);
+  }
+
+  location.href = "/info";
+}
+</script>
+</body>
+</html>
