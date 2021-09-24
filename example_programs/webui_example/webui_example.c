@@ -614,10 +614,10 @@ int callback_read_config_param (const struct _u_request * request, struct _u_res
 #endif
 
 #if (JSON_ENABLE == EN_CJSON)
-  //   char * resp_body = NULL;
   char resp_body[256];
-  sprintf(resp_body, "{\"%s\":\"%s\"}", param, value);  
-  ulfius_set_cjson_body_response(response, 200, resp_body);
+  sprintf(resp_body, "{\"%s\":\"%s\"}", param, value);
+  cJSON* resp_json = cJSON_Parse(resp_body);
+  ulfius_set_cjson_body_response(response, 200, resp_json);
 #endif
   
   return U_CALLBACK_CONTINUE;
@@ -647,10 +647,10 @@ int callback_write_config_param (const struct _u_request * request, struct _u_re
 #endif
 
 #if (JSON_ENABLE == EN_CJSON)
-  //   char * resp_body = NULL;
   char resp_body[256];
-  sprintf(resp_body, "{\"%s\":\"%s\"}", param, value);  
-  ulfius_set_cjson_body_response(response, 200, resp_body);
+  sprintf(resp_body, "{\"%s\":\"%s\"}", param, value);
+  cJSON* resp_json = cJSON_Parse(resp_body);
+  ulfius_set_cjson_body_response(response, 200, resp_json);
 #endif
 
   return U_CALLBACK_CONTINUE;

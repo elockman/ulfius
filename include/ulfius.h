@@ -95,6 +95,9 @@ int y_close_logs();
 #ifndef U_DISABLE_JANSSON
 #include <jansson.h>
 #endif
+#ifndef U_DISABLE_CJSON
+#include <cJSON.h>
+#endif
 
 /**
  * @defgroup const Constants
@@ -1169,7 +1172,7 @@ int ulfius_set_json_body_response(struct _u_response * response, const unsigned 
  * @param j_body a json_t to stringify in the body
  * @return U_OK on success
  */
-int ulfius_set_cjson_body_response(struct _u_response * response, const unsigned int status, const char * j_body);
+int ulfius_set_cjson_body_response(struct _u_response * response, const unsigned int status, cJSON *json);
 #endif
 
 /**
