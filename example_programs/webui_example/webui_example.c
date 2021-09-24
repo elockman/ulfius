@@ -1,6 +1,6 @@
 /**
  * 
- * Xeal WebUI, using Ulfius Framework
+ * WebUI, using Ulfius Framework
  * 
  * AUTHOR: Eric Lockman
  *   DATE: 09/13/2021
@@ -14,10 +14,9 @@
 
 #include <string.h>
 // #include <jansson.h>
+// #include <u_example.h>
 
 #include <ulfius.h>
-#include <u_example.h>
-
 #include "static_compressed_inmemory_website_callback.h"
 #include "http_compression_callback.h"
 
@@ -33,7 +32,12 @@
 #define PRINT_RESP 1
 #define GPIO_ENABLE 0
 #define ADC_ENABLE 0
-#define JSON_ENABLE 1
+
+#define NO_JSON    0
+#define EN_JANSSON 1
+#define EN_CJSON   2
+
+#define JSON_ENABLE EN_CJSON
 
 #if JSON_ENABLE
 #include <cJSON.h>
@@ -601,15 +605,20 @@ int callback_read_config_param (const struct _u_request * request, struct _u_res
   sprintf(param, "%s", u_map_get(request->map_url, "param"));
   read_config_param(group, param, value);
 
-//   json_t * json_body = NULL;
-//   json_body = json_object();
-//   json_object_set_new(json_body, param, json_string(value));
-//   ulfius_set_json_body_response(response, 200, json_body);
-//   json_decref(json_body);
+#if (JSON_ENABLE == EN_JANSSON)
+  json_t * json_body = NULL;
+  json_body = json_object();
+  json_object_set_new(json_body, param, json_string(value));
+  ulfius_set_json_body_response(response, 200, json_body);
+  json_decref(json_body);
+#endif
 
-  char * resp_body = NULL;
+#if (JSON_ENABLE == EN_CJSON)
+  //   char * resp_body = NULL;
+  char resp_body[256];
   sprintf(resp_body, "{\"%s\":\"%s\"}", param, value);  
   ulfius_set_cjson_body_response(response, 200, resp_body);
+#endif
   
   return U_CALLBACK_CONTINUE;
 }
@@ -629,15 +638,20 @@ int callback_write_config_param (const struct _u_request * request, struct _u_re
   sprintf(value, "%s", u_map_get(request->map_url, "value"));
   write_config_param(group, param, value);
 
-//   json_t * json_body = NULL;
-//   json_body = json_object();
-//   json_object_set_new(json_body, param, json_string(value));
-//   ulfius_set_json_body_response(response, 200, json_body);
-//   json_decref(json_body);
+#if (JSON_ENABLE == EN_JANSSON)
+  json_t * json_body = NULL;
+  json_body = json_object();
+  json_object_set_new(json_body, param, json_string(value));
+  ulfius_set_json_body_response(response, 200, json_body);
+  json_decref(json_body);
+#endif
 
-  char * resp_body = NULL;
+#if (JSON_ENABLE == EN_CJSON)
+  //   char * resp_body = NULL;
+  char resp_body[256];
   sprintf(resp_body, "{\"%s\":\"%s\"}", param, value);  
   ulfius_set_cjson_body_response(response, 200, resp_body);
+#endif
 
   return U_CALLBACK_CONTINUE;
 }
@@ -647,7 +661,7 @@ int callback_write_config_param (const struct _u_request * request, struct _u_re
  */
 static int callback_info_page (const struct _u_request * request, struct _u_response * response, void * user_data) {
   FILE* fp = fopen("./static/info.html", "r");
-  char buf[8096] = {0};
+  char buf[PAGE_SIZE] = {0};
   fread(buf, 1, sizeof(buf), fp);
   fclose(fp);
 
@@ -660,7 +674,7 @@ static int callback_info_page (const struct _u_request * request, struct _u_resp
  */
 static int callback_control_page (const struct _u_request * request, struct _u_response * response, void * user_data) {
   FILE* fp = fopen("./static/control.html", "r");
-  char buf[8096] = {0};
+  char buf[PAGE_SIZE] = {0};
   fread(buf, 1, sizeof(buf), fp);
   fclose(fp);
 
@@ -673,7 +687,7 @@ static int callback_control_page (const struct _u_request * request, struct _u_r
  */
 static int callback_config_page (const struct _u_request * request, struct _u_response * response, void * user_data) {
   FILE* fp = fopen("./static/config.html", "r");
-  char buf[16096] = {0};
+  char buf[2*PAGE_SIZE] = {0};
   fread(buf, 1, sizeof(buf), fp);
   fclose(fp);
 
@@ -686,7 +700,7 @@ static int callback_config_page (const struct _u_request * request, struct _u_re
  */
 static int callback_admin_page (const struct _u_request * request, struct _u_response * response, void * user_data) {
   FILE* fp = fopen("./static/admin.html", "r");
-  char buf[8096] = {0};
+  char buf[PAGE_SIZE] = {0};
   fread(buf, 1, sizeof(buf), fp);
   fclose(fp);
 
@@ -699,7 +713,7 @@ static int callback_admin_page (const struct _u_request * request, struct _u_res
  */
 static int callback_neighbors_page (const struct _u_request * request, struct _u_response * response, void * user_data) {
   FILE* fp = fopen("./static/neighbors.html", "r");
-  char buf[8096] = {0};
+  char buf[PAGE_SIZE] = {0};
   fread(buf, 1, sizeof(buf), fp);
   fclose(fp);
 
@@ -712,7 +726,7 @@ static int callback_neighbors_page (const struct _u_request * request, struct _u
  */
 static int callback_sensors_page (const struct _u_request * request, struct _u_response * response, void * user_data) {
   FILE* fp = fopen("./static/sensors.html", "r");
-  char buf[8096] = {0};
+  char buf[PAGE_SIZE] = {0};
   fread(buf, 1, sizeof(buf), fp);
   fclose(fp);
 
@@ -725,7 +739,7 @@ static int callback_sensors_page (const struct _u_request * request, struct _u_r
  */
 static int callback_logging_page (const struct _u_request * request, struct _u_response * response, void * user_data) {
   FILE* fp = fopen("./static/logging.html", "r");
-  char buf[8096] = {0};
+  char buf[PAGE_SIZE] = {0};
   fread(buf, 1, sizeof(buf), fp);
   fclose(fp);
 
@@ -738,7 +752,7 @@ static int callback_logging_page (const struct _u_request * request, struct _u_r
  */
 static int callback_login_page (const struct _u_request * request, struct _u_response * response, void * user_data) {
   FILE* fp = fopen("./static/login.html", "r");
-  char buf[8096] = {0};
+  char buf[PAGE_SIZE] = {0};
   fread(buf, 1, sizeof(buf), fp);
   fclose(fp);
 
@@ -751,7 +765,7 @@ static int callback_login_page (const struct _u_request * request, struct _u_res
  */
 static int callback_logout_page (const struct _u_request * request, struct _u_response * response, void * user_data) {
   FILE* fp = fopen("./static/logout.html", "r");
-  char buf[8096] = {0};
+  char buf[PAGE_SIZE] = {0};
   fread(buf, 1, sizeof(buf), fp);
   fclose(fp);
 
@@ -764,7 +778,7 @@ static int callback_logout_page (const struct _u_request * request, struct _u_re
  */
 static int callback_test_page (const struct _u_request * request, struct _u_response * response, void * user_data) {
   FILE* fp = fopen("./static/test.html", "r");
-  char buf[8096] = {0};
+  char buf[PAGE_SIZE] = {0};
   fread(buf, 1, sizeof(buf), fp);
   fclose(fp);
 
@@ -782,7 +796,7 @@ int main (int argc, char **argv) {
   // Initialize the instance
   struct _u_instance instance;
   
-  y_init_logs("xeal_webui", Y_LOG_MODE_CONSOLE, Y_LOG_LEVEL_DEBUG, NULL, "Starting Xeal WebUI code");
+  y_init_logs("webui_example", Y_LOG_MODE_CONSOLE, Y_LOG_LEVEL_DEBUG, NULL, "Starting WebUI code ");
   
   if (u_init_compressed_inmemory_website_config(&file_config) == U_OK) {
     u_map_put(&file_config.mime_types, ".html", "text/html");
@@ -846,7 +860,7 @@ int main (int argc, char **argv) {
     
     // Start the framework
     if (ulfius_start_framework(&instance) == U_OK) {
-      printf("Start Xeal WebUI on port %u\n", instance.port);
+      printf("Start WebUI at http://localhost:%u/info\n", instance.port);
       
       // Wait for the user to press <enter> on the console to quit the application
       getchar();

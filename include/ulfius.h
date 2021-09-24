@@ -175,7 +175,7 @@ typedef enum {
   U_OPT_STATUS                        = 28, ///< HTTP response status code (200, 404, 500, etc), expected option value type: long
   U_OPT_AUTH_REALM                    = 29, ///< realm to send to the client response on authenticationb failed, expected option value type: const char *
   U_OPT_SHARED_DATA                   = 30, ///< any data shared between callback functions, must be allocated and freed by the callback functions, expected option value type: void *
-#ifndef U_DISABLE_JANSSON
+#ifndef U_DISABLE_CJSON
   U_OPT_CJSON_BODY                     = 32, ///< Set a stringified cjson body to the request or the reponse, expected option value type: char *
 #endif
   U_OPT_HTTP_URL_APPEND               = 31  ///< append char * value to the current url, expected option value type: const char *
@@ -1158,6 +1158,18 @@ json_t * ulfius_get_json_body_response(struct _u_response * response, json_error
  * @return U_OK on success
  */
 int ulfius_set_json_body_response(struct _u_response * response, const unsigned int status, const json_t * j_body);
+#endif
+
+#ifndef U_DISABLE_CJSON
+/**
+ * ulfius_set_cjson_body_response
+ * Add a cjson body to a response
+ * @param response the response to retrieve the JSON data
+ * @param status the HTTP status for the response
+ * @param j_body a json_t to stringify in the body
+ * @return U_OK on success
+ */
+int ulfius_set_cjson_body_response(struct _u_response * response, const unsigned int status, const char * j_body);
 #endif
 
 /**

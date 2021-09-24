@@ -1,5 +1,5 @@
 #
-# Xeal counter program
+# WebUI example program
 #
 # Makefile used to build the software
 #

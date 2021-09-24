@@ -722,7 +722,7 @@ json_t * ulfius_get_json_body_response(struct _u_response * response, json_error
  */
 int ulfius_set_cjson_body_response(struct _u_response * response, const unsigned int status, const char * j_body) {
   if (response != NULL && j_body != NULL) {
-    response->binary_body = j_body;
+    response->binary_body = (void*)j_body;
     response->binary_body_length = o_strlen((char*)response->binary_body);
     response->status = status;
     u_map_put(response->map_header, ULFIUS_HTTP_HEADER_CONTENT, ULFIUS_HTTP_ENCODING_JSON);
