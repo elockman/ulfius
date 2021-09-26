@@ -32,12 +32,7 @@
 #define PRINT_RESP 1
 #define GPIO_ENABLE 0
 #define ADC_ENABLE 0
-
-#define NO_JSON    0
-#define EN_JANSSON 1
-#define EN_CJSON   2
-
-#define JSON_ENABLE EN_CJSON
+#define JSON_ENABLE 1
 
 #if JSON_ENABLE
 #include <cJSON.h>
@@ -439,23 +434,42 @@ char * print_map(const struct _u_map * map) {
   }
 }
 
+
+/**
+ * set_cjson_body_response
+ * Add a cjson body to a response
+ * return U_OK on success
+ */
+int set_cjson_body_response(struct _u_response * response, const unsigned int status, cJSON *json) {
+  if (response != NULL && json != NULL) {
+    o_free(response->binary_body);
+    response->binary_body = cJSON_Print(json);
+    response->binary_body_length = o_strlen((char*)response->binary_body);
+    response->status = status;
+
+    u_map_put(response->map_header, ULFIUS_HTTP_HEADER_CONTENT, ULFIUS_HTTP_ENCODING_JSON);
+    return U_OK;
+  } else {
+    return U_ERROR_PARAMS;
+  }
+}
+
+
 /**
  * Read config param from config.json file
  * URL format:   http://localhost:8080/led?clr=blue&val=0
  * returns { param : "value"}
  */
 int callback_led_control (const struct _u_request * request, struct _u_response * response, void * user_data) {
-  json_t * json_body = NULL;
+  char resp_body[256];
   char clr[24];
   char val[24];
   
   sprintf(clr, "%s", u_map_get(request->map_url, "clr"));
   sprintf(val, "%s", u_map_get(request->map_url, "val"));
-  json_body = json_object();
 
-#if GPIO_ENABLE
   int state = atoi(val);
-#endif
+
   if(!strcmp("red",clr)){
 #if GPIO_ENABLE
     if(state){
@@ -464,7 +478,7 @@ int callback_led_control (const struct _u_request * request, struct _u_response 
       gpio_cmd_output(PinLedRed, 0);
     }
 #endif
-    json_object_set_new(json_body, "red", json_string(val));
+    sprintf(resp_body, "{\"red\":\"%d\"}", state);
   }else if(!strcmp("green",clr)){
 #if GPIO_ENABLE
     if(state){
@@ -473,7 +487,7 @@ int callback_led_control (const struct _u_request * request, struct _u_response 
       gpio_cmd_output(PinLedBlu, 0);
     }
 #endif
-    json_object_set_new(json_body, "green", json_string(val));
+    sprintf(resp_body, "{\"green\":\"%d\"}", state);
   }else if(!strcmp("blue",clr)){
 #if GPIO_ENABLE
     if(state){
@@ -482,10 +496,11 @@ int callback_led_control (const struct _u_request * request, struct _u_response 
       gpio_cmd_output(PinLedGrn, 0);
     }
 #endif
-    json_object_set_new(json_body, "blue", json_string(val));
+    sprintf(resp_body, "{\"blue\":\"%d\"}", state);
   }
-  ulfius_set_json_body_response(response, 200, json_body);
-  json_decref(json_body);
+
+  cJSON* resp_json = cJSON_Parse(resp_body);
+  set_cjson_body_response(response, 200, resp_json);
   
   return U_CALLBACK_CONTINUE;
 }
@@ -496,24 +511,24 @@ int callback_led_control (const struct _u_request * request, struct _u_response 
  * returns { param : "value"}
  */
 int callback_wifi_control (const struct _u_request * request, struct _u_response * response, void * user_data) {
-  json_t * json_body = NULL;
+  char resp_body[256];
   char val[24];
 
   sprintf(val, "%s", u_map_get(request->map_url, "val"));
-  json_body = json_object();
 
 #if GPIO_ENABLE
   int state = atoi(val);
   if(state){
     gpio_cmd_output(PinWifiPwr, 1);
+    sprintf(resp_body, "{\"wifi\":\"1\"}");
   }else{
     gpio_cmd_output(PinWifiPwr, 0);
+    sprintf(resp_body, "{\"wifi\":\"0\"}");
   }
 #endif
 
-  json_object_set_new(json_body, "wifi", json_string(val));
-  ulfius_set_json_body_response(response, 200, json_body);
-  json_decref(json_body);
+  cJSON* resp_json = cJSON_Parse(resp_body);
+  set_cjson_body_response(response, 200, resp_json);
   
   return U_CALLBACK_CONTINUE;
 }
@@ -524,25 +539,25 @@ int callback_wifi_control (const struct _u_request * request, struct _u_response
  * returns { param : "value"}
  */
 int callback_mesh_control (const struct _u_request * request, struct _u_response * response, void * user_data) {
-  json_t * json_body = NULL;
+  char resp_body[256];
   char val[24];
 
   sprintf(val, "%s", u_map_get(request->map_url, "val"));
-  json_body = json_object();
 
 #if GPIO_ENABLE
   int state = atoi(val);
   if(state){
     gpio_cmd_output(PinMeshPwr, 1);
+    sprintf(resp_body, "{\"mesh\":\"1\"}");
   }else{
     gpio_cmd_output(PinMeshPwr, 0);
+    sprintf(resp_body, "{\"mesh\":\"0\"}");
   }
 #endif
 
-  json_object_set_new(json_body, "mesh", json_string(val));
-  ulfius_set_json_body_response(response, 200, json_body);
-  json_decref(json_body);
-  
+  cJSON* resp_json = cJSON_Parse(resp_body);
+  set_cjson_body_response(response, 200, resp_json);
+
   return U_CALLBACK_CONTINUE;
 }
 
@@ -552,41 +567,36 @@ int callback_mesh_control (const struct _u_request * request, struct _u_response
  * returns { param : "value"}
  */
 int callback_adc_control (const struct _u_request * request, struct _u_response * response, void * user_data) {
-  json_t * json_body = NULL;
+  char resp_body[256];
   char chan[24];
-  char val[24];
   int adc = 0;
 
   sprintf(chan, "%s", u_map_get(request->map_url, "chan"));
-  json_body = json_object();
 
   if(!strcmp("model",chan)){
 #if ADC_ENABLE
     adc = adc_read_raw(ADC_CHAN_MODEL);
 #endif
-    sprintf(val, "%d", adc);
-    json_object_set_new(json_body, "model", json_string(val));
+    sprintf(resp_body, "{\"model\":\"%d\"}", adc);
   }else if(!strcmp("hw",chan)){
 #if ADC_ENABLE
     adc = adc_read_raw(ADC_CHAN_VERSION);
 #endif
-    sprintf(val, "%d", adc);
-    json_object_set_new(json_body, "hw", json_string(val));
+    sprintf(resp_body, "{\"hw\":\"%d\"}", adc);
   }else if(!strcmp("vin",chan)){
 #if ADC_ENABLE
     adc = adc_read_raw(ADC_CHAN_VIN);
 #endif
-    sprintf(val, "%d", adc);
-    json_object_set_new(json_body, "vin", json_string(val));
+    sprintf(resp_body, "{\"vin\":\"%d\"}", adc);
   }else if(!strcmp("pb",chan)){
 #if ADC_ENABLE
     adc = (int)gpio_get_input(PinBtn));
 #endif
-    sprintf(val, "%d", adc);
-    json_object_set_new(json_body, "pb", json_string(val));
+    sprintf(resp_body, "{\"pb\":\"%d\"}", adc);
   }
-  ulfius_set_json_body_response(response, 200, json_body);
-  json_decref(json_body);
+
+  cJSON* resp_json = cJSON_Parse(resp_body);
+  set_cjson_body_response(response, 200, resp_json);
   
   return U_CALLBACK_CONTINUE;
 }
@@ -605,20 +615,10 @@ int callback_read_config_param (const struct _u_request * request, struct _u_res
   sprintf(param, "%s", u_map_get(request->map_url, "param"));
   read_config_param(group, param, value);
 
-#if (JSON_ENABLE == EN_JANSSON)
-  json_t * json_body = NULL;
-  json_body = json_object();
-  json_object_set_new(json_body, param, json_string(value));
-  ulfius_set_json_body_response(response, 200, json_body);
-  json_decref(json_body);
-#endif
-
-#if (JSON_ENABLE == EN_CJSON)
   char resp_body[256];
   sprintf(resp_body, "{\"%s\":\"%s\"}", param, value);
   cJSON* resp_json = cJSON_Parse(resp_body);
-  ulfius_set_cjson_body_response(response, 200, resp_json);
-#endif
+  set_cjson_body_response(response, 200, resp_json);
   
   return U_CALLBACK_CONTINUE;
 }
@@ -638,20 +638,10 @@ int callback_write_config_param (const struct _u_request * request, struct _u_re
   sprintf(value, "%s", u_map_get(request->map_url, "value"));
   write_config_param(group, param, value);
 
-#if (JSON_ENABLE == EN_JANSSON)
-  json_t * json_body = NULL;
-  json_body = json_object();
-  json_object_set_new(json_body, param, json_string(value));
-  ulfius_set_json_body_response(response, 200, json_body);
-  json_decref(json_body);
-#endif
-
-#if (JSON_ENABLE == EN_CJSON)
   char resp_body[256];
   sprintf(resp_body, "{\"%s\":\"%s\"}", param, value);
   cJSON* resp_json = cJSON_Parse(resp_body);
-  ulfius_set_cjson_body_response(response, 200, resp_json);
-#endif
+  set_cjson_body_response(response, 200, resp_json);
 
   return U_CALLBACK_CONTINUE;
 }

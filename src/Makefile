@@ -52,13 +52,6 @@ else
 DISABLE_JANSSON=1
 endif
 
-ifndef CJSONFLAG
-DISABLE_CJSON=0
-LCJSON=-lcjson
-else
-DISABLE_CJSON=1
-endif
-
 ifndef CURLFLAG
 DISABLE_CURL=0
 LCURL=-lcurl
@@ -125,13 +118,6 @@ $(CONFIG_FILE):
 		sed -i -e 's/\#cmakedefine U_DISABLE_JANSSON/\/* #undef U_DISABLE_JANSSON *\//g' $(CONFIG_FILE); \
 		echo "JANSSON SUPPORT    ENABLED"; \
 	fi
-	@if [ "$(DISABLE_CJSON)" = "1" ]; then \
-		sed -i -e 's/\#cmakedefine U_DISABLE_CJSON/\#define U_DISABLE_CJSON/g' $(CONFIG_FILE); \
-		echo "CJSON SUPPORT    DISABLED"; \
-	else \
-		sed -i -e 's/\#cmakedefine U_DISABLE_CJSON/\/* #undef U_DISABLE_CJSON *\//g' $(CONFIG_FILE); \
-		echo "CJSON SUPPORT    ENABLED"; \
-	fi
 	@if [ "$(DISABLE_CURL)" = "1" ]; then \
 		sed -i -e 's/\#cmakedefine U_DISABLE_CURL/\#define U_DISABLE_CURL/g' $(CONFIG_FILE); \
 		echo "CURL SUPPORT       DISABLED"; \
@@ -197,7 +183,7 @@ target: $(OBJECTS)
 	$(CC) $(CFLAGS) $<
 
 libulfius.so: $(OBJECTS) $(PKGCONFIG_FILE)
-	$(CC) -shared -fPIC -Wl,$(SONAME),$(OUTPUT) -o $(OUTPUT).$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH) $(OBJECTS) $(LIBS) $(LIBSDEP) $(LYDER) $(LJANSSON) $(LCJSON) $(LCURL) $(LGNUTLS)
+	$(CC) -shared -fPIC -Wl,$(SONAME),$(OUTPUT) -o $(OUTPUT).$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH) $(OBJECTS) $(LIBS) $(LIBSDEP) $(LYDER) $(LJANSSON) $(LCURL) $(LGNUTLS)
 	ln -sf $(OUTPUT).$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH) $(OUTPUT)
 
 libulfius.a: $(OBJECTS) $(PKGCONFIG_FILE)
@@ -238,7 +224,7 @@ release: libulfius.so
 
 static: ADDITIONALFLAGS=-O3
 
-static: LIB_STATIC=$(LIBSDEP) $(LYDER) $(LJANSSON) $(LCJSON) $(LCURL) $(LGNUTLS)
+static: LIB_STATIC=$(LIBSDEP) $(LYDER) $(LJANSSON) $(LCURL) $(LGNUTLS)
 
 static: libulfius.a
 
