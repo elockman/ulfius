@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="utf-8">
 <title>Control</title>
 <script>
 async function redLedOn() { 
   document.getElementById('rLED').innerHTML = 'OFF';
+  document.getElementById('led_l1x').src='led_red.png'
   document.getElementById('rLED').onclick= function() {redLedOff()};
   fetch('led?clr=red&val=1')
     .then(response => response.json())
@@ -12,6 +14,7 @@ async function redLedOn() {
 }
 async function redLedOff() { 
   document.getElementById('rLED').innerHTML = 'ON';
+  document.getElementById('led_l1x').src='led_off.png'
   document.getElementById('rLED').onclick= function() {redLedOn()};
   fetch('led?clr=red&val=0')
     .then(response => response.json())
@@ -20,6 +23,7 @@ async function redLedOff() {
 
 async function grnLedOn() { 
   document.getElementById('gLED').innerHTML = 'OFF';
+  document.getElementById('led_l2x').src='led_red.png'
   document.getElementById('gLED').onclick= function() {grnLedOff()};
   fetch('led?clr=green&val=1')
     .then(response => response.json())
@@ -27,6 +31,7 @@ async function grnLedOn() {
 }
 async function grnLedOff() { 
   document.getElementById('gLED').innerHTML = 'ON';
+  document.getElementById('led_l2x').src='led_off.png'
   document.getElementById('gLED').onclick= function() {grnLedOn()};
   fetch('led?clr=green&val=0')
     .then(response => response.json())
@@ -35,6 +40,7 @@ async function grnLedOff() {
 
 async function bluLedOn() { 
   document.getElementById('bLED').innerHTML = 'OFF';
+  document.getElementById('led_l3x').src='led_red.png'
   document.getElementById('bLED').onclick= function() {bluLedOff()};
   fetch('led?clr=blue&val=1')
     .then(response => response.json())
@@ -42,6 +48,7 @@ async function bluLedOn() {
 }
 async function bluLedOff() { 
   document.getElementById('bLED').innerHTML = 'ON';
+  document.getElementById('led_l3x').src='led_off.png'
   document.getElementById('bLED').onclick= function() {bluLedOn()};
   fetch('led?clr=blue&val=0')
     .then(response => response.json())
@@ -110,30 +117,30 @@ async function getInputValues() {
 <body onload="getInputValues()" >
 
 <nav class="menu">
-    X-SITE <a href="info">INFO</a> | <a href="neighbors">NEIGHBORS</a> | <a href="sensors">SENSORS</a> | <a href="logging">LOGGING</a> | <a href="control">CONTROL</a> | <a href="config">CONFIG</a> | <a href="admin">ADMIN</a> | <a href="login">LOGIN</a> | <a href="logout">LOGOUT</a>
+    X-SITE  |  <a href="info">INFO</a> | <a href="neighbors">NEIGHBORS</a> | <a href="sensors">SENSORS</a> | <a href="logging">LOGGING</a> | <a href="control">CONTROL</a> | <a href="config">CONFIG</a> | <a href="admin">ADMIN</a> | <a href="login">LOGIN</a> | <a href="logout">LOGOUT</a>
 </nav>
 <p> </p>
 
 <h1>Control</h1>
 
 <u><h3>DIGITAL INPUTs</h3></u>
-<img id="in_btn" src="images/led-off.png" width="15" height="15"> Button: <p id="val_btn"></p>
+<img id="in_btn" src="led_off.png" width="15" height="15"> Button: <p id="val_btn"></p>
 <p> </p>
 
 <u><h3>DIGITAL OUTPUTs</h3></u>
-<img id="led_l1x" src="images/led-off.png" width="15" height="15">
+<img id="led_l1x" src="led_off.png" width="15" height="15">
 <button type="button" id=rLED onclick="redLedOn()">ON</button> Red LED
 <p> </p>
-<img id="led_l2x" src="images/led-off.png" width="15" height="15">
+<img id="led_l2x" src="led_off.png" width="15" height="15">
 <button type="button" id=gLED onclick="grnLedOn()">ON</button> Green LED
 <p> </p>
-<img id="led_l3x" src="images/led-off.png" width="15" height="15">
+<img id="led_l3x" src="led_off.png" width="15" height="15">
 <button type="button" id=bLED onclick="bluLedOn()">ON</button> Blue LED
 <p> </p>
-<img id="led_mesh" src="images/led-off.png" width="15" height="15">
+<img id="led_mesh" src="led_off.png" width="15" height="15">
 <button type="button" id=bmesh onclick="meshPwrOn()">ON</button> Mesh Radio Power
 <p> </p>
-<img id="led_wifi" src="images/led-off.png" width="15" height="15">
+<img id="led_wifi" src="led_off.png" width="15" height="15">
 <button type="button" id=bwifi onclick="wifiPwrOn()">ON</button> WiFi Radio Power
 <p> </p>
 
@@ -176,6 +183,7 @@ async function getInputValues() {
     .then(response => response.json())
     .then(data => {
       console.log(data);
+      document.getElementById('in_btn').src='led_red.png'
       document.getElementById('val_btn').innerHTML=data.state;
     })
 
