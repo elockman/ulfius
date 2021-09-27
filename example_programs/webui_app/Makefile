@@ -19,21 +19,21 @@ EXAMPLE_INCLUDE=../include
 STATIC_COMPRESSED_INMEMORY_WEBSITE=../../example_callbacks/static_compressed_inmemory_website
 HTTP_COMRESSION=../../example_callbacks/http_compression
 CFLAGS+=-c -Wall -I$(ULFIUS_INCLUDE) -I$(EXAMPLE_INCLUDE) -I$(STATIC_COMPRESSED_INMEMORY_WEBSITE) -I$(HTTP_COMRESSION) -D_REENTRANT $(ADDITIONALFLAGS) $(CPPFLAGS)
-LIBS=-lc -lz -lpthread -lulfius -lorcania -ljansson -L$(ULFIUS_LOCATION)
+LIBS=-lc -lz -lpthread -lulfius -lorcania -L$(ULFIUS_LOCATION)
 
 ifndef YDERFLAG
 LIBS+= -lyder
 endif
 
-all: webui_example
+all: webui_app
 
 clean:
-	rm -f *.o webui_example
+	rm -f *.o webui_app
 	rm -f *.o cJSON
 
 debug: ADDITIONALFLAGS=-DDEBUG -g -O0
 
-debug: webui_example
+debug: webui_app
 
 ../../src/libulfius.so:
 	cd $(ULFIUS_LOCATION) && $(MAKE) debug CURLFLAG=1 GNUTLSFLAG=1
@@ -47,11 +47,11 @@ http_compression_callback.o: $(HTTP_COMRESSION)/http_compression_callback.c
 cJSON.o: cJSON.c
 	$(CC) $(CFLAGS) cJSON.c
 
-webui_example.o: webui_example.c cJSON.c
-	$(CC) $(CFLAGS) webui_example.c cJSON.c -DDEBUG -g -O0
+webui_app.o: webui_app.c cJSON.c
+	$(CC) $(CFLAGS) webui_app.c cJSON.c -DDEBUG -g -O0
 
-webui_example: ../../src/libulfius.so webui_example.o cJSON.o static_compressed_inmemory_website_callback.o http_compression_callback.o
-	$(CC) -o webui_example webui_example.o cJSON.o static_compressed_inmemory_website_callback.o http_compression_callback.o $(LIBS)
+webui_app: ../../src/libulfius.so webui_app.o cJSON.o static_compressed_inmemory_website_callback.o http_compression_callback.o
+	$(CC) -o webui_app webui_app.o cJSON.o static_compressed_inmemory_website_callback.o http_compression_callback.o $(LIBS)
 
-test: webui_example
-	LD_LIBRARY_PATH=$(ULFIUS_LOCATION):${LD_LIBRARY_PATH} ./webui_example
+test: webui_app
+	LD_LIBRARY_PATH=$(ULFIUS_LOCATION):${LD_LIBRARY_PATH} ./webui_app

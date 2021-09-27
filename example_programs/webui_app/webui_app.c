@@ -13,16 +13,12 @@
 #include <time.h>
 
 #include <string.h>
-// #include <jansson.h>
-// #include <u_example.h>
 
 #include <ulfius.h>
 #include "static_compressed_inmemory_website_callback.h"
 #include "http_compression_callback.h"
 
-#define PORT 8080
-// #define PREFIX "/sheep"
-// #define FILE_PREFIX "/upload"
+#define PORT 80
 #define FILE_PREFIX "/info"
 #define STATIC_FOLDER "static"
 
@@ -30,7 +26,7 @@
 #define DEBUG_LVL 1
 
 #define PRINT_RESP 1
-#define GPIO_ENABLE 0
+#define GPIO_ENABLE 1
 #define ADC_ENABLE 0
 #define JSON_ENABLE 1
 
@@ -377,7 +373,6 @@ void write_config_param(char* group, char* param, char* value)
   fclose(fp);
   cJSON* root = cJSON_Parse(buf);
   out = cJSON_Print(root);
-//   printf("before modify:%s\n",out);
 
   cJSON* conf_obj = cJSON_GetObjectItem(root, "configuration");
   if(conf_obj){
@@ -385,7 +380,6 @@ void write_config_param(char* group, char* param, char* value)
     cJSON* group_param = cJSON_GetObjectItem(group_obj, param);
     cJSON_SetValuestring(group_param, value);
     out = cJSON_Print(root);
-//     printf("after modify:%s\n",out);
 
     fp = fopen(CONFIG_FILE,"w");
     if(fp == NULL) {
@@ -482,22 +476,26 @@ int callback_led_control (const struct _u_request * request, struct _u_response 
   }else if(!strcmp("green",clr)){
 #if GPIO_ENABLE
     if(state){
-      gpio_cmd_output(PinLedBlu, 1);
+      gpio_cmd_output(PinLedGrn, 1);
     }else{
-      gpio_cmd_output(PinLedBlu, 0);
+      gpio_cmd_output(PinLedGrn, 0);
     }
 #endif
     sprintf(resp_body, "{\"green\":\"%d\"}", state);
   }else if(!strcmp("blue",clr)){
 #if GPIO_ENABLE
     if(state){
-      gpio_cmd_output(PinLedGrn, 1);
+      gpio_cmd_output(PinLedBlu, 1);
     }else{
-      gpio_cmd_output(PinLedGrn, 0);
+      gpio_cmd_output(PinLedBlu, 0);
     }
 #endif
     sprintf(resp_body, "{\"blue\":\"%d\"}", state);
   }
+
+#if DEBUG_LVL >= 1
+  printf("%s\n", resp_body);
+#endif
 
   cJSON* resp_json = cJSON_Parse(resp_body);
   set_cjson_body_response(response, 200, resp_json);
@@ -786,7 +784,7 @@ int main (int argc, char **argv) {
   // Initialize the instance
   struct _u_instance instance;
   
-  y_init_logs("webui_example", Y_LOG_MODE_CONSOLE, Y_LOG_LEVEL_DEBUG, NULL, "Starting WebUI code ");
+  y_init_logs("webui_app", Y_LOG_MODE_CONSOLE, Y_LOG_LEVEL_DEBUG, NULL, "Starting WebUI code ");
   
   if (u_init_compressed_inmemory_website_config(&file_config) == U_OK) {
     u_map_put(&file_config.mime_types, ".html", "text/html");
@@ -851,6 +849,9 @@ int main (int argc, char **argv) {
     // Start the framework
     if (ulfius_start_framework(&instance) == U_OK) {
       printf("Start WebUI at http://localhost:%u/info\n", instance.port);
+      #if GPIO_ENABLE
+      gpio_init();
+      #endif
       
       // Wait for the user to press <enter> on the console to quit the application
       getchar();
