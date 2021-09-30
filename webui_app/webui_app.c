@@ -18,24 +18,42 @@
 #include "static_compressed_inmemory_website_callback.h"
 #include "http_compression_callback.h"
 
-#define PORT 80
-#define FILE_PREFIX "/info"
-#define STATIC_FOLDER "static"
+#define RELEASE_BUILD  1
+// #define DEV_BUILD      1
+// #define LOCAL_PC_BUILD 1
 
-
-#define DEBUG_LVL 1
-
-#define PRINT_RESP 1
-#define GPIO_ENABLE 1
-#define ADC_ENABLE 0
-#define JSON_ENABLE 1
+#if RELEASE_BUILD==1
+  #define DEBUG_LVL 0
+  #define PORT 80
+  #define CONFIG_FILE "/user-data/profile/config/config.json"
+  #define STATIC_PATH "/user-data/xsite/webui/static/"
+  #define GPIO_ENABLE 1
+  #define ADC_ENABLE 0
+  #define JSON_ENABLE 1
+#elif DEV_BUILD==1
+  #define DEBUG_LVL 1
+  #define PORT 8080
+  #define CONFIG_FILE "config.json"
+  #define STATIC_PATH "./static/"
+  //#define STATIC_PATH "/test/ulfius/example_programs/webui_app/static/"
+  #define GPIO_ENABLE 1
+  #define ADC_ENABLE 0
+  #define JSON_ENABLE 1
+#elif LOCAL_PC_BUILD==1
+  #define DEBUG_LVL 1
+  #define PORT 8080
+  #define CONFIG_FILE "config.json"
+  #define STATIC_PATH "./static/"
+  #define GPIO_ENABLE 0
+  #define ADC_ENABLE 0
+  #define JSON_ENABLE 1
+#endif
 
 #if JSON_ENABLE
 #include <cJSON.h>
 #endif
 
-// #define CONFIG_FILE "/user-data/profile/config/config.json"
-#define CONFIG_FILE "config.json"
+#define FILE_PREFIX "/info"
 
 #define ADC_CHAN_MODEL    10
 #define ADC_CHAN_VERSION  9
@@ -319,7 +337,8 @@ void adc_init()
 
 void reboot(void)
 {
-  system("reboot");
+  char cmd[] = "reboot";
+  system(cmd);
 }
 
 void announce(void)
@@ -395,38 +414,38 @@ void write_config_param(char* group, char* param, char* value)
 #endif
 
 
-/**
- * decode a u_map into a string
- */
-char * print_map(const struct _u_map * map) {
-  char * line, * to_return = NULL;
-  const char **keys, * value;
-  int len, i;
-  if (map != NULL) {
-    keys = u_map_enum_keys(map);
-    for (i=0; keys[i] != NULL; i++) {
-      value = u_map_get(map, keys[i]);
-      len = snprintf(NULL, 0, "key is %s, length is %zu, value is %.*s", keys[i], u_map_get_length(map, keys[i]), (int)u_map_get_length(map, keys[i]), value);
-      line = o_malloc((len+1)*sizeof(char));
-      snprintf(line, (len+1), "key is %s, length is %zu, value is %.*s", keys[i], u_map_get_length(map, keys[i]), (int)u_map_get_length(map, keys[i]), value);
-      if (to_return != NULL) {
-        len = o_strlen(to_return) + o_strlen(line) + 1;
-        to_return = o_realloc(to_return, (len+1)*sizeof(char));
-        if (o_strlen(to_return) > 0) {
-          strcat(to_return, "\n");
-        }
-      } else {
-        to_return = o_malloc((o_strlen(line) + 1)*sizeof(char));
-        to_return[0] = 0;
-      }
-      strcat(to_return, line);
-      o_free(line);
-    }
-    return to_return;
-  } else {
-    return NULL;
-  }
-}
+// /**
+//  * decode a u_map into a string
+//  */
+// char * print_map(const struct _u_map * map) {
+//   char * line, * to_return = NULL;
+//   const char **keys, * value;
+//   int len, i;
+//   if (map != NULL) {
+//     keys = u_map_enum_keys(map);
+//     for (i=0; keys[i] != NULL; i++) {
+//       value = u_map_get(map, keys[i]);
+//       len = snprintf(NULL, 0, "key is %s, length is %zu, value is %.*s", keys[i], u_map_get_length(map, keys[i]), (int)u_map_get_length(map, keys[i]), value);
+//       line = o_malloc((len+1)*sizeof(char));
+//       snprintf(line, (len+1), "key is %s, length is %zu, value is %.*s", keys[i], u_map_get_length(map, keys[i]), (int)u_map_get_length(map, keys[i]), value);
+//       if (to_return != NULL) {
+//         len = o_strlen(to_return) + o_strlen(line) + 1;
+//         to_return = o_realloc(to_return, (len+1)*sizeof(char));
+//         if (o_strlen(to_return) > 0) {
+//           strcat(to_return, "\n");
+//         }
+//       } else {
+//         to_return = o_malloc((o_strlen(line) + 1)*sizeof(char));
+//         to_return[0] = 0;
+//       }
+//       strcat(to_return, line);
+//       o_free(line);
+//     }
+//     return to_return;
+//   } else {
+//     return NULL;
+//   }
+// }
 
 
 /**
@@ -648,8 +667,15 @@ int callback_write_config_param (const struct _u_request * request, struct _u_re
  * info page
  */
 static int callback_info_page (const struct _u_request * request, struct _u_response * response, void * user_data) {
-  FILE* fp = fopen("./static/info.html", "r");
   char buf[PAGE_SIZE] = {0};
+  char path[] = STATIC_PATH;
+  char filename[] = "info.html";
+  strcat(path, filename);
+#if DEBUG_LVL >= 1
+  printf("HTML: %s\n", path);
+#endif
+
+  FILE* fp = fopen((void *)path, "r");
   fread(buf, 1, sizeof(buf), fp);
   fclose(fp);
 
@@ -661,8 +687,15 @@ static int callback_info_page (const struct _u_request * request, struct _u_resp
  * control page
  */
 static int callback_control_page (const struct _u_request * request, struct _u_response * response, void * user_data) {
-  FILE* fp = fopen("./static/control.html", "r");
   char buf[PAGE_SIZE] = {0};
+  char path[] = STATIC_PATH;
+  char filename[] = "control.html";
+  strcat(path, filename);
+#if DEBUG_LVL >= 1
+  printf("HTML: %s\n", path);
+#endif
+
+  FILE* fp = fopen((void *)path, "r");
   fread(buf, 1, sizeof(buf), fp);
   fclose(fp);
 
@@ -674,8 +707,15 @@ static int callback_control_page (const struct _u_request * request, struct _u_r
  * config page
  */
 static int callback_config_page (const struct _u_request * request, struct _u_response * response, void * user_data) {
-  FILE* fp = fopen("./static/config.html", "r");
-  char buf[2*PAGE_SIZE] = {0};
+  char buf[PAGE_SIZE] = {0};
+  char path[] = STATIC_PATH;
+  char filename[] = "config.html";
+  strcat(path, filename);
+#if DEBUG_LVL >= 1
+  printf("HTML: %s\n", path);
+#endif
+
+  FILE* fp = fopen((void *)path, "r");
   fread(buf, 1, sizeof(buf), fp);
   fclose(fp);
 
@@ -687,8 +727,15 @@ static int callback_config_page (const struct _u_request * request, struct _u_re
  * admin page
  */
 static int callback_admin_page (const struct _u_request * request, struct _u_response * response, void * user_data) {
-  FILE* fp = fopen("./static/admin.html", "r");
   char buf[PAGE_SIZE] = {0};
+  char path[] = STATIC_PATH;
+  char filename[] = "admin.html";
+  strcat(path, filename);
+#if DEBUG_LVL >= 1
+  printf("HTML: %s\n", path);
+#endif
+
+  FILE* fp = fopen((void *)path, "r");
   fread(buf, 1, sizeof(buf), fp);
   fclose(fp);
 
@@ -700,8 +747,15 @@ static int callback_admin_page (const struct _u_request * request, struct _u_res
  * neighbors page
  */
 static int callback_neighbors_page (const struct _u_request * request, struct _u_response * response, void * user_data) {
-  FILE* fp = fopen("./static/neighbors.html", "r");
   char buf[PAGE_SIZE] = {0};
+  char path[] = STATIC_PATH;
+  char filename[] = "neighbors.html";
+  strcat(path, filename);
+#if DEBUG_LVL >= 1
+  printf("HTML: %s\n", path);
+#endif
+
+  FILE* fp = fopen((void *)path, "r");
   fread(buf, 1, sizeof(buf), fp);
   fclose(fp);
 
@@ -713,8 +767,15 @@ static int callback_neighbors_page (const struct _u_request * request, struct _u
  * sensors page
  */
 static int callback_sensors_page (const struct _u_request * request, struct _u_response * response, void * user_data) {
-  FILE* fp = fopen("./static/sensors.html", "r");
   char buf[PAGE_SIZE] = {0};
+  char path[] = STATIC_PATH;
+  char filename[] = "sensors.html";
+  strcat(path, filename);
+#if DEBUG_LVL >= 1
+  printf("HTML: %s\n", path);
+#endif
+
+  FILE* fp = fopen((void *)path, "r");
   fread(buf, 1, sizeof(buf), fp);
   fclose(fp);
 
@@ -726,8 +787,15 @@ static int callback_sensors_page (const struct _u_request * request, struct _u_r
  * logging page
  */
 static int callback_logging_page (const struct _u_request * request, struct _u_response * response, void * user_data) {
-  FILE* fp = fopen("./static/logging.html", "r");
   char buf[PAGE_SIZE] = {0};
+  char path[] = STATIC_PATH;
+  char filename[] = "logging.html";
+  strcat(path, filename);
+#if DEBUG_LVL >= 1
+  printf("HTML: %s\n", path);
+#endif
+
+  FILE* fp = fopen((void *)path, "r");
   fread(buf, 1, sizeof(buf), fp);
   fclose(fp);
 
@@ -739,8 +807,15 @@ static int callback_logging_page (const struct _u_request * request, struct _u_r
  * login page
  */
 static int callback_login_page (const struct _u_request * request, struct _u_response * response, void * user_data) {
-  FILE* fp = fopen("./static/login.html", "r");
   char buf[PAGE_SIZE] = {0};
+  char path[] = STATIC_PATH;
+  char filename[] = "login.html";
+  strcat(path, filename);
+#if DEBUG_LVL >= 1
+  printf("HTML: %s\n", path);
+#endif
+
+  FILE* fp = fopen((void *)path, "r");
   fread(buf, 1, sizeof(buf), fp);
   fclose(fp);
 
@@ -752,8 +827,15 @@ static int callback_login_page (const struct _u_request * request, struct _u_res
  * logout page
  */
 static int callback_logout_page (const struct _u_request * request, struct _u_response * response, void * user_data) {
-  FILE* fp = fopen("./static/logout.html", "r");
   char buf[PAGE_SIZE] = {0};
+  char path[] = STATIC_PATH;
+  char filename[] = "logout.html";
+  strcat(path, filename);
+#if DEBUG_LVL >= 1
+  printf("HTML: %s\n", path);
+#endif
+
+  FILE* fp = fopen((void *)path, "r");
   fread(buf, 1, sizeof(buf), fp);
   fclose(fp);
 
@@ -765,8 +847,15 @@ static int callback_logout_page (const struct _u_request * request, struct _u_re
  * test page
  */
 static int callback_test_page (const struct _u_request * request, struct _u_response * response, void * user_data) {
-  FILE* fp = fopen("./static/test.html", "r");
   char buf[PAGE_SIZE] = {0};
+  char path[] = STATIC_PATH;
+  char filename[] = "test.html";
+  strcat(path, filename);
+#if DEBUG_LVL >= 1
+  printf("HTML: %s\n", path);
+#endif
+
+  FILE* fp = fopen((void *)path, "r");
   fread(buf, 1, sizeof(buf), fp);
   fclose(fp);
 
@@ -809,23 +898,7 @@ int main (int argc, char **argv) {
     
     // Max post param size is 16 Kb, which means an uploaded file is no more than 16 Kb
     instance.max_post_param_size = 16*1024;
-    
-//     if (ulfius_set_upload_file_callback_function(&instance, &file_upload_callback, "my cls") != U_OK) {
-//       y_log_message(Y_LOG_LEVEL_ERROR, "Error ulfius_set_upload_file_callback_function");
-//     }
-    
-    // Endpoint list declaration
-    // The first 3 are webservices with a specific url
-    // The last endpoint will be called for every GET call and will serve the static files
-//     ulfius_add_endpoint_by_val(&instance, "POST", PREFIX, NULL, 1, &callback_sheep_counter_start, &nb_sheep);
-//     ulfius_add_endpoint_by_val(&instance, "PUT", PREFIX, NULL, 1, &callback_sheep_counter_add, &nb_sheep);
-//     ulfius_add_endpoint_by_val(&instance, "DELETE", PREFIX, NULL, 1, &callback_sheep_counter_reset, &nb_sheep);
-//     ulfius_add_endpoint_by_val(&instance, "*", PREFIX, NULL, 2, &callback_http_compression, NULL);
-//     ulfius_add_endpoint_by_val(&instance, "*", STATIC_FOLDER, "/upload", 1, &callback_upload_file, NULL);
-//     ulfius_add_endpoint_by_val(&instance, "*", STATIC_FOLDER, "/submit", 1, &callback_form_submit, NULL);
-//     ulfius_add_endpoint_by_val(&instance, "GET", "/test", NULL, 1, &callback_test, NULL);
-//     ulfius_add_endpoint_by_val(&instance, "GET", "/tests", NULL, 1, &callback_get_counts, NULL);
-    
+
     ulfius_add_endpoint_by_val(&instance, "GET", "/info", NULL, 1, &callback_info_page, NULL);
     ulfius_add_endpoint_by_val(&instance, "GET", "/control", NULL, 1, &callback_control_page, NULL);
     ulfius_add_endpoint_by_val(&instance, "GET", "/config", NULL, 1, &callback_config_page, NULL);
@@ -844,7 +917,6 @@ int main (int argc, char **argv) {
     ulfius_add_endpoint_by_val(&instance, "GET", "/adc", NULL, 1, &callback_adc_control, NULL);
     ulfius_add_endpoint_by_val(&instance, "GET", "/cfg", NULL, 1, &callback_read_config_param, NULL);
     ulfius_add_endpoint_by_val(&instance, "GET", "/cfg_set", NULL, 1, &callback_write_config_param, NULL);
-//     ulfius_add_endpoint_by_val(&instance, "GET", "*", NULL, 1, &callback_static_compressed_inmemory_website, &file_config);
     
     // Start the framework
     if (ulfius_start_framework(&instance) == U_OK) {
@@ -854,6 +926,7 @@ int main (int argc, char **argv) {
       #endif
       
       // Wait for the user to press <enter> on the console to quit the application
+      while(1);
       getchar();
     } else {
       printf("Error starting framework\n");
@@ -869,3 +942,4 @@ int main (int argc, char **argv) {
   
   return 0;
 }
+
